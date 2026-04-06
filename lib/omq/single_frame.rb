@@ -8,6 +8,11 @@ module OMQ
   # thread-safe atomic operations.
   #
   module SingleFrame
+    # Sends a message, rejecting multipart messages.
+    #
+    # @param message [String, Array<String>] message to send (must be single-frame)
+    # @raise [ArgumentError] if a multipart message is provided
+    # @return [void]
     def send(message)
       if message.is_a?(Array) && message.size > 1
         raise ArgumentError, "#{self.class} does not support multipart messages"

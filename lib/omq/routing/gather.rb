@@ -15,6 +15,7 @@ module OMQ
         @tasks      = []
       end
 
+
       # @return [FairQueue]
       #
       attr_reader :recv_queue
@@ -25,11 +26,13 @@ module OMQ
         add_fair_recv_connection(connection)
       end
 
+
       # @param connection [Connection]
       #
       def connection_removed(connection)
         @recv_queue.remove_queue(connection)
       end
+
 
       # GATHER is read-only.
       #
@@ -37,7 +40,8 @@ module OMQ
         raise "GATHER sockets cannot send"
       end
 
-      #
+
+      # Stops all background tasks.
       def stop
         @tasks.each(&:stop)
         @tasks.clear

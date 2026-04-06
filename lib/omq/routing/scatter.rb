@@ -15,11 +15,13 @@ module OMQ
         init_round_robin(engine)
       end
 
+
       # SCATTER is write-only.
       #
       def recv_queue
         raise "SCATTER sockets cannot receive"
       end
+
 
       # @param connection [Connection]
       #
@@ -29,6 +31,7 @@ module OMQ
         start_reaper(connection)
       end
 
+
       # @param connection [Connection]
       #
       def connection_removed(connection)
@@ -36,11 +39,13 @@ module OMQ
         remove_round_robin_send_connection(connection)
       end
 
+
       # @param parts [Array<String>]
       #
       def enqueue(parts)
         enqueue_round_robin(parts)
       end
+
 
       # Stops all background tasks (send pumps, reapers).
       #
