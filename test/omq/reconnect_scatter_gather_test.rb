@@ -10,7 +10,7 @@ describe "Reconnect after server restart — SCATTER/GATHER" do
   # Helper: connect side reconnects after bind side restarts on same port.
   #
   def assert_reconnects(bind_class, connect_class, &exchange)
-    Async do
+    Sync do
       server = bind_class.new(nil, linger: 0)
       server.bind("tcp://127.0.0.1:0")
       port = server.last_tcp_port

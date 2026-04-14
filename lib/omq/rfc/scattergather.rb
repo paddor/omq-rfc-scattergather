@@ -11,7 +11,6 @@
 require "omq"
 
 require_relative "scattergather/version"
-require_relative "../single_frame"
 require_relative "../routing/scatter"
 require_relative "../routing/gather"
 require_relative "../scatter_gather"

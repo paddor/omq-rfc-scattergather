@@ -9,13 +9,14 @@ module OMQ
     # Creates a new SCATTER socket.
     #
     # @param endpoints [String, Array<String>, nil] endpoint(s) to connect to
-    # @param linger [Integer] linger period in milliseconds
+    # @param linger [Numeric] linger period in seconds (Float::INFINITY = wait forever, 0 = drop)
     # @param send_hwm [Integer, nil] send high-water mark
-    # @param send_timeout [Integer, nil] send timeout in milliseconds
+    # @param send_timeout [Integer, nil] send timeout in seconds
     # @param backend [Object, nil] optional transport backend
-    def initialize(endpoints = nil, linger: 0, send_hwm: nil, send_timeout: nil, backend: nil)
-      _init_engine(:SCATTER, linger: linger, send_hwm: send_hwm, send_timeout: send_timeout, backend: backend)
-      _attach(endpoints, default: :connect)
+    def initialize(endpoints = nil, linger: Float::INFINITY, send_hwm: nil, send_timeout: nil, backend: nil)
+      init_engine(:SCATTER, send_hwm: send_hwm, send_timeout: send_timeout, backend: backend)
+      @options.linger = linger
+      attach_endpoints(endpoints, default: :connect)
     end
   end
 
@@ -28,13 +29,14 @@ module OMQ
     # Creates a new GATHER socket.
     #
     # @param endpoints [String, Array<String>, nil] endpoint(s) to bind to
-    # @param linger [Integer] linger period in milliseconds
+    # @param linger [Numeric] linger period in seconds (Float::INFINITY = wait forever, 0 = drop)
     # @param recv_hwm [Integer, nil] receive high-water mark
-    # @param recv_timeout [Integer, nil] receive timeout in milliseconds
+    # @param recv_timeout [Integer, nil] receive timeout in seconds
     # @param backend [Object, nil] optional transport backend
-    def initialize(endpoints = nil, linger: 0, recv_hwm: nil, recv_timeout: nil, backend: nil)
-      _init_engine(:GATHER, linger: linger, recv_hwm: recv_hwm, recv_timeout: recv_timeout, backend: backend)
-      _attach(endpoints, default: :bind)
+    def initialize(endpoints = nil, linger: Float::INFINITY, recv_hwm: nil, recv_timeout: nil, backend: nil)
+      init_engine(:GATHER, recv_hwm: recv_hwm, recv_timeout: recv_timeout, backend: backend)
+      @options.linger = linger
+      attach_endpoints(endpoints, default: :bind)
     end
   end
 end

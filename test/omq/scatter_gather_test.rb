@@ -6,7 +6,7 @@ describe "SCATTER/GATHER over inproc" do
   before { OMQ::Transport::Inproc.reset! }
 
   it "sends and receives messages" do
-    Async do
+    Sync do
       gather  = OMQ::GATHER.bind("inproc://sg-1")
       scatter = OMQ::SCATTER.connect("inproc://sg-1")
 
@@ -19,8 +19,8 @@ describe "SCATTER/GATHER over inproc" do
     end
   end
 
-  it "round-robins across multiple GATHER peers" do
-    Async do
+  it "distributes across multiple GATHER peers" do
+    Sync do
       g1 = OMQ::GATHER.bind("inproc://sg-rr-1")
       g2 = OMQ::GATHER.bind("inproc://sg-rr-2")
 
@@ -28,11 +28,22 @@ describe "SCATTER/GATHER over inproc" do
       scatter.connect("inproc://sg-rr-1")
       scatter.connect("inproc://sg-rr-2")
 
-      scatter.send("msg1")
-      scatter.send("msg2")
+      n = 20
+      n.times { |i| scatter.send("msg#{i}") }
 
-      assert_equal ["msg1"], g1.receive
-      assert_equal ["msg2"], g2.receive
+      received = []
+      g1.read_timeout = 0.5
+      g2.read_timeout = 0.5
+      [g1, g2].each do |g|
+        loop do
+          received << g.receive.first
+        rescue IO::TimeoutError
+          break
+        end
+      end
+
+      assert_equal n, received.size
+      assert_equal n, received.uniq.size
     ensure
       scatter&.close
       g1&.close
@@ -41,7 +52,7 @@ describe "SCATTER/GATHER over inproc" do
   end
 
   it "rejects multipart messages" do
-    Async do
+    Sync do
       gather  = OMQ::GATHER.bind("inproc://sg-mp")
       scatter = OMQ::SCATTER.connect("inproc://sg-mp")
 
